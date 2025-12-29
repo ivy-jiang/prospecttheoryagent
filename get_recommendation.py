@@ -78,15 +78,18 @@ if __name__ == "__main__":
     
     # Configuration
     data_file = 'qqq_data_60days.csv'  # Using fresh 60-day data
-    model_path = 'prospect_theory_model.pth'
-    WINDOW_SIZE = 20
+    model_path = 'prospect_theory_model_tuned.pth'
+    WINDOW_SIZE = 60
     
     # Load data
     print(f"\n📊 Loading market data from {data_file}...")
     try:
-        df = pd.read_csv(data_file)
+        df = pd.read_csv(data_file, index_col=0, parse_dates=True)
         df = df.apply(pd.to_numeric, errors='coerce')
         df = df.dropna()
+        
+        # Capture raw latest data for interpretation
+        latest_raw = df.iloc[-1].copy()
         
         # Apply same preprocessing as training
         df['log_return'] = np.log(df['price'] / df['price'].shift(1))
@@ -98,7 +101,18 @@ if __name__ == "__main__":
             df[col] = (df[col] - df[col].mean()) / (df[col].std() + 1e-8)
         
         print(f"✅ Data loaded: {len(df)} days of data")
-        print(f"📅 Latest date in dataset: Row {len(df)}")
+        print(f"📅 Latest date in dataset: {df.index[-1].strftime('%Y-%m-%d')}")
+        
+        # --- Print Market Context ---
+        print("\n" + "=" * 70)
+        print("📊 MARKET CONTEXT (Latest Data)")
+        print("=" * 70)
+        print(f"Price: ${latest_raw['price']:.2f}")
+        print(f"RSI:   {latest_raw['RSI']:.2f}  (>70 Overbought, <30 Oversold)")
+        print(f"MACD:  {latest_raw['MACD']:.2f}  (Positive = Bullish, Negative = Bearish)")
+        print(f"100MA: ${latest_raw['100D_MA']:.2f} (Trend Baseline)")
+        print(f"VIX:   {latest_raw['market_sentiment']:.2f}   (Market Fear Index)")
+        print(f"Yield: {latest_raw['US_10y_yield']:.2f}%  (10-Year Treasury)")
         
     except FileNotFoundError:
         print(f"❌ Error: {data_file} not found.")
