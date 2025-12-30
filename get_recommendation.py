@@ -188,10 +188,21 @@ if __name__ == "__main__":
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     current_price = df['price'].iloc[-1]
     
+    # Construct Reasoning String
+    rsi = latest_raw['RSI']
+    ma = latest_raw['100D_MA']
+    vix = latest_raw['market_sentiment']
+    
+    trend = "Positive" if current_price > ma else "Negative"
+    rsi_status = "Overbought" if rsi > 70 else ("Oversold" if rsi < 30 else "Neutral")
+    
+    reasoning = f"{rsi_status} RSI ({rsi:.0f}), {trend} Trend, VIX {vix:.0f}."
+    
     try:
         with open(log_file, 'a', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow([current_date, recommendation, f"{confidence_pct:.1f}%", f"{current_price:.2f}", "Auto-generated"])
+            # Format: date, action, confidence, price, reasoning, notes
+            writer.writerow([current_date, recommendation, f"{confidence_pct:.1f}%", f"{current_price:.2f}", reasoning, "Auto-generated"])
         print(f"\n✅ Logged recommendation to {log_file}")
     except Exception as e:
         print(f"\n❌ Failed to log trade: {e}")

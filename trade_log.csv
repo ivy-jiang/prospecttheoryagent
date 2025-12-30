@@ -1,8 +1,8 @@
-date,action,confidence,price,notes
-2025-11-21 09:30:00,BUY,N/A,589.31,Reconstructed (Old Model)
-2025-11-28 09:30:00,BUY,N/A,618.45,Reconstructed (Old Model)
-2025-12-05 09:30:00,BUY,N/A,624.68,Reconstructed (Old Model)
-2025-12-12 09:30:00,BUY,N/A,612.83,Reconstructed (Old Model)
-2025-12-19 09:30:00,BUY,N/A,616.26,Reconstructed (Old Model)
-2025-12-27 15:01:39,SELL,1.9%,623.89,Live Signal (Tuned Model)
-2025-12-29 18:54:33,HOLD,0.1%,620.87,Auto-generated
+date,action,confidence,price,reasoning,notes
+2025-11-21 09:30:00,BUY,N/A,589.31,N/A,Reconstructed (Old Model)
+2025-11-28 09:30:00,BUY,N/A,618.45,N/A,Reconstructed (Old Model)
+2025-12-05 09:30:00,BUY,N/A,624.68,N/A,Reconstructed (Old Model)
+2025-12-12 09:30:00,BUY,N/A,612.83,N/A,Reconstructed (Old Model)
+2025-12-19 09:30:00,BUY,N/A,616.26,N/A,Reconstructed (Old Model)
+2025-12-27 15:01:39,SELL,1.9%,623.89,Model detected potential downturn/overextension.,Live Signal (Tuned Model)
+2025-12-29 18:54:33,HOLD,0.1%,620.87,"Neutral RSI (54), Positive Trend (Price > 100MA), Low Volatility (VIX 14). No clear edge.",Auto-generated
