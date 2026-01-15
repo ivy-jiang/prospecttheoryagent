@@ -69,11 +69,11 @@ def generate_csv():
     # 5. Clean and Export Last 60 Days
     # Select only the requested columns
     final_cols = ['price', 'RSI', '100D_MA', 'MACD', 'US_10y_yield', 'US_2y_yield', 'market_sentiment']
-    final_df = df[final_cols].tail(60)
+    final_df = df[final_cols].tail(90)
     
     # Save to CSV (without date index, as requested)
     filename = 'qqq_data_60days.csv'
-    final_df.to_csv(filename, index=False)
+    final_df.to_csv(filename, index=True)
     
     print(f"\nSUCCESS: Generated '{filename}' with {len(final_df)} rows.")
     print(f"Location: {os.path.abspath(filename)}")
