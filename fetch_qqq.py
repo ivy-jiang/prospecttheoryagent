@@ -72,6 +72,11 @@ def generate_csv():
     final_df = df[final_cols].tail(90)
     
     # Save to CSV (without date index, as requested)
+    # Save to CSV (without date index, as requested)
+    if final_df.empty:
+        print("❌ Error: No data fetched. CSV not created.")
+        exit(1)
+
     filename = 'qqq_data_60days.csv'
     final_df.to_csv(filename, index=True)
     

@@ -88,6 +88,11 @@ if __name__ == "__main__":
         df = df.apply(pd.to_numeric, errors='coerce')
         df = df.dropna()
         
+        # Check if dataframe is empty
+        if df.empty:
+            print(f"❌ Error: {data_file} is empty. Please run data fetcher again.")
+            exit(1)
+
         # Capture raw latest data for interpretation
         latest_raw = df.iloc[-1].copy()
         
