@@ -13,3 +13,4 @@ date,action,confidence,price,reasoning,notes
 2026-01-14 20:28:12,HOLD,0.6%,619.55,"Neutral RSI (50), Positive Trend, VIX 17.",Auto-generated
 2026-01-14 20:31:57,HOLD,0.6%,619.55,"Neutral RSI (50), Positive Trend, VIX 17.",Auto-generated
 2026-01-19 14:39:15,SELL,1.3%,621.26,"Neutral RSI (52), Positive Trend, VIX 19.",Auto-generated
+2026-01-22 18:31:21,SELL,1.6%,620.76,"Neutral RSI (52), Positive Trend, VIX 16.",Auto-generated
