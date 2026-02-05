@@ -1,47 +1,65 @@
 # Prospect Theory Agent 🚀
 
-**Prospect Theory Agent** is an AI-powered trading assistant designed to trade **QQQ** (Nasdaq-100 ETF) on a weekly basis. It uses **Prospect Theory** and **Reinforcement Learning** to make trading decisions that account for human-like risk perception (loss aversion).
-
-## ⚡️ Quick Start: How to Trade
-
-This system is designed for a **Weekly Trading Schedule** (typically Friday mornings).
-
-1.  **Run the Assistant**:
-    Open your terminal and run:
-    ```bash
-    ./weekly_trade.sh
-    ```
-2.  **Read the Signal**:
-    The script will fetch the latest data and output a clear recommendation:
-    *   📈 **BUY**: Open a long position.
-    *   📉 **SELL**: Close position / Go short (depending on your strategy).
-    *   ⏸️ **HOLD**: Do nothing.
-3.  **Execute & Log**:
-    *   Place the trade in your brokerage account.
-    *   The system **automatically logs** this recommendation to `trade_log.csv`.
+**Prospect Theory Agent** is an AI-powered trading assistant designed to trade **QQQ** (Nasdaq-100 ETF). It uses **Prospect Theory** and **Reinforcement Learning (DQN)** to make trading decisions that account for human-like risk perception (loss aversion), maximizing *Subjective Utility* rather than just raw expected value.
 
 ---
 
-## 📂 Project Structure
+## ⚡️ Daily Signal: How to Trade
 
-### 🧠 Core System
-*   **`weekly_trade.sh`**: The main entry point. Orchestrates data fetching and signal generation.
-*   **`fetch_qqq.py`**: Fetches live market data from Yahoo Finance and FRED (Treasury yields). Generates `qqq_data_60days.csv`.
-*   **`get_recommendation.py`**: Loads the trained AI model, analyzes the latest market state, prints the signal, and logs it to `trade_log.csv`.
-*   **`prospect_theory_agent.py`**: Defines the Neural Network architecture (DQN) and the custom "Prospect Theory" loss function that makes the AI risk-aware.
-*   **`trade_log.csv`**: Your official trading journal. Automatically updated with every signal.
+1.  **Run the Assistant**:
+    Run the following command to fetch the latest data and get today's recommendation:
+    ```bash
+    python fetch_qqq.py && python get_recommendation.py
+    ```
 
-### 📊 Analysis & Research
-*   **`analyze_60day_weekly.py`**: Backtests the weekly strategy over the last 60 days.
-*   **`analyze_advanced_strategies.py`**: Compares different trading rules (e.g., threshold-based trading vs. always trading).
-*   **`analyze_confidence.py`**: Visualizes the model's confidence levels over time.
-*   **`analyze_spread.py`**: Investigates the "spread" between Q-values (a measure of model certainty).
-*   **`analyze_days.py`**: Determines which day of the week is statistically best for this strategy.
+2.  **Read the Signal**:
+    The system will output:
+    *   📈 **BUY**: Model predicts an uptrend.
+    *   📉 **SELL**: Model predicts a downtrend.
+    *   ⏸️ **HOLD**: Market is uncertain; stay neutral.
+    *   **Confidence %**: Assessing how strong the signal is.
 
-### 💾 Data & Models
-*   **`prospect_theory_model.pth`**: The saved weights of the trained PyTorch model.
-*   **`qqq_market_data.csv`**: Historical training data.
-*   **`qqq_data_60days.csv`**: The most recent 60 days of data, used for live inference.
+3.  **Automatic Logging**:
+    Every recommendation is automatically saved to **`trade_log.csv`**.
+
+---
+
+## 📚 Model Documentation
+
+We believe in "White Box" AI. All inner workings of the model are fully documented:
+
+*   **[`MODEL_DOCUMENTATION.md`](MODEL_DOCUMENTATION.md)**:  
+    **The Theory Manual.** Explains the Neural Network architecture, why we use Prospect Theory, why specific variables (like Log Returns and VIX) were chosen, and the rationale behind engineering choices (ReLU, Adam, Window Sizes).
+    
+*   **[`MODEL_PERFORMANCE_REPORT.md`](MODEL_PERFORMANCE_REPORT.md)**:  
+    **The Test Scores.** Details the rigourous "In-Sample vs Out-of-Sample" testing methodology used to verify that the model is robust and not just memorizing the past.
+
+---
+
+## 📂 Repository Guide
+
+### 🚀 Core Production Files
+*   **`prospect_theory_agent.py`**: **The Brain.** Defines the Dual-Stream DQN architecture and the custom Prospect Theory loss function.
+*   **`fetch_qqq.py`**: **The Eyes.** Fetches live market data (Price, VIX, Treasury Yields) from Yahoo Finance/FRED.
+*   **`get_recommendation.py`**: **The Mouth.** Loads the trained model (`.pth`), analyzes the latest data, and speaks the actionable recommendation.
+*   **`trade_log.csv`**: **The Journal.** Persistent history of all model recommendations.
+*   **`prospect_theory_model_tuned.pth`**: **The Knowledge.** The saved weights of the currently active, fully-trained model (500 episodes).
+
+### 🧪 Training & Verification
+*   **`train_tuned_model.py`**: The script used to train the production model. It runs for 500 episodes with optimized hyperparameters (Window=60, Batch=128).
+*   **`verify_robustness.py`**: A diagnostic tool. It performs a strict **Train/Test Split** (80/20) to check for overfitting. *Run this if you want to stress-test the strategy logic yourself.*
+*   **`backtest_full_history.py`**: Runs the trained model over the entire history of data to generate an equity curve and calculating total PnL.
+
+### 📊 Research & Analysis Tools
+*   **`analyze_60day_weekly.py`**: Specific backtest focused on the last 2 months.
+*   **`analyze_spread.py`**: Studies the "Spread" (gap) between the Q-values of Buy vs Sell. A wider spread = higher confidence.
+*   **`analyze_confidence.py`**: Visualizes how "sure" the model has been over time.
+*   **`analyze_decision_streaks.py`**: Checks if the model gets stuck in "Buy" or "Sell" loops too often.
+*   **`analyze_weekly_fridays.py`**: Research script investigating if Friday-only trading performed better.
+
+### 💾 Data Files
+*   **`qqq_market_data.csv`**: Deep historical data used for training.
+*   **`qqq_data_60days.csv`**: rolling window of recent data used for daily inference.
 
 ---
 
@@ -49,22 +67,12 @@ This system is designed for a **Weekly Trading Schedule** (typically Friday morn
 
 ### Prerequisites
 *   Python 3.8+
-*   `pip install pandas yfinance torch numpy pandas_datareader`
+*   Packages: `pip install pandas yfinance torch numpy pandas_datareader matplotlib`
 
 ### GitHub Workflow
-To save your changes and trade history to the cloud:
-
-1.  **Save Changes**:
-    ```bash
-    git add .
-    git commit -m "Weekly trade update"
-    ```
-2.  **Upload**:
-    ```bash
-    git push
-    ```
-
----
-
-## 🤖 How It Works
-The agent observes a 20-day window of market features (Price, RSI, MACD, Treasury Yields, VIX). It calculates **Q-values** for Buying, Selling, or Holding. Unlike standard AI, it uses a **Prospect Theory** value function, meaning it is trained to be more sensitive to losses than gains, mimicking a disciplined human trader but with algorithmic precision.
+To update the repo with your latest daily recommendations:
+```bash
+git add .
+git commit -m "Update model results for $(date +%Y-%m-%d)"
+git push
+```
