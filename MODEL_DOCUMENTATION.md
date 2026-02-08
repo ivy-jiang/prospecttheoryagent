@@ -33,13 +33,14 @@ Neural networks require stationary, normalized data to learn effectively. We app
 | **Price** | $\ln(P_t / P_{t-1})$ (Log Returns) | **Stationarity**. Raw prices are unbounded and non-stationary. Returns capture the *rate of change*, which is statistically stable. |
 | **RSI** | 14-Day Calculation | **Momentum**. Normalized 0-100 scale indicating overbought/oversold conditions. |
 | **MACD** | EMA(12) - EMA(26) | **Trend Following**. Captures convergence/divergence of moving averages. |
-| **Moving Avg** | Price / 100-Day SMA | **Trend Context**. Expressed as a ratio or normalized value to show position relative to long-term trend. |
+| **Moving Avg** | 100-Day SMA (Z-Scored) | **Trend Baseline**. The raw moving average is standardized to indicate the relative level of the trend line within the dataset. |
 | **Yields/VIX** | Z-Score Normalization | **Scaling**. These inputs are on different scales (e.g., VIX ~20, Yield ~0.04). |
 
 ### 2.3 Normalization
 **Method:** Z-Score Standardization ($z = \frac{x - \mu}{\sigma}$)
-*   Applied to all features to ensure they have a mean of 0 and standard deviation of 1.
-*   **Why?** Prevents features with larger magnitudes (like RSI=50) from drowning out features with smaller magnitudes (like Returns=0.01) during gradient descent.
+*   **Applied to:** All input features (Returns, RSI, MACD, MA, VIX, Yields).
+*   **Excluded:** The raw `price` column (which is fed separately to the network for absolute price context).
+*   **Reasoning:** Deep learning networks fail if one input is 0.01 (Returns) and another is 600 (MA). Z-scoring forces all inputs into the same ~(-3 to +3) range, ensuring the optimizer treats them with equal importance.
 
 ---
 
@@ -48,8 +49,11 @@ Neural networks require stationary, normalized data to learn effectively. We app
 The network is a **Dual-Stream DQN** with custom Prospect Theory heads.
 
 ### 3.1 Network Structure
-1.  **Input Layer**: Flattened vector of size `(Window_Size × Num_Features) + (Window_Size × Price)`.
-    *   *Note*: Including raw prices provides absolute level context, while normalized features provide relative context.
+1.  **Input Layer (The "State")**:
+    *   The state vector is a concatenation ($S = [F, P]$) of two distinct parts:
+        *   **Part A: Features ($F$)**: The Z-Scored variables (Returns, RSI, etc.). These provide the **Pattern** (Relative Market Shape).
+        *   **Part B: Context ($P$)**: The Raw Prices ($). These provide the **Scale** (Absolute Dollar Magnitude).
+    *   **Why?** The Features tell the model *if* it should buy (Technical Analysis), while the Absolute Price helps the Utility Layer calculate *how much* joy/pain a % move will cause in dollar terms (Prospect Theory).
 2.  **"World Model" (Core Layers)**:
     *   **Layer 1**: Linear (Input $\to$ 128) + ReLU
     *   **Layer 2**: Linear (128 $\to$ 128) + ReLU
